@@ -55,6 +55,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Cleanup.cs" />
     <Compile Include="DarkMenu.cs" />
+    <Compile Include="DriverBootstrap.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="IconFactory.cs" />
     <Compile Include="Log.cs" />

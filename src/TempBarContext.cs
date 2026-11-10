@@ -47,6 +47,10 @@ namespace TempBar
             if (gpuOnly) _cfg.ShowCpu = false;
             _lightTheme = ResolveLightTheme();
 
+            // Install the sensor driver from our temp workspace first, so LibreHardwareMonitor
+            // never drops a .sys file next to the executable (e.g. on the Desktop).
+            if (_cfg.ShowCpu) DriverBootstrap.TryStart();
+
             _sensors = new SensorService { IntervalMs = _cfg.IntervalMs };
             _sensors.CpuEnabled = _cfg.ShowCpu;
             _sensors.GpuEnabled = _cfg.ShowGpu;
