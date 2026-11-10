@@ -3,6 +3,15 @@
 **把 CPU / GPU 温度以纯白文字直接贴在 Windows 任务栏上**——无背景、无边框、无面板，像系统自带的一部分。
 单文件绿色版，1 MB，双击即用，退出自动清除所有痕迹。
 
+[![最新版本](https://img.shields.io/github/v/release/china-wkz/TempBar?color=blue)](https://github.com/china-wkz/TempBar/releases/latest)
+[![下载量](https://img.shields.io/github/downloads/china-wkz/TempBar/total)](https://github.com/china-wkz/TempBar/releases)
+
+### ⬇️ 下载
+
+**[→ 下载 TempBar.exe](https://github.com/china-wkz/TempBar/releases/latest)**（单文件，免安装，约 1 MB）
+
+不想下载二进制？克隆仓库后执行 `.\build.ps1` 自行构建，见[构建](#构建)。
+
 ![任务栏效果](docs/widget.png)
 
 > 左边是 CPU，右边是 GPU。没有标签，因为看两次就记住了。
