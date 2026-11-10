@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>TempBar</RootNamespace>
+    <AssemblyName>TempBar</AssemblyName>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <LangVersion>latest</LangVersion>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <ApplicationIcon>..\assets\tempbar.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>false</GenerateBindingRedirectsOutputType>
+    <OutputPath>..\dist\</OutputPath>
+    <AppConfig>App.config</AppConfig>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Management" />
+    <!-- Embedded at build time and loaded from memory: the result is one portable exe. -->
+    <Reference Include="LibreHardwareMonitorLib">
+      <HintPath>..\libs\LibreHardwareMonitorLib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="HidSharp">
+      <HintPath>..\libs\HidSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\libs\LibreHardwareMonitorLib.dll">
+      <LogicalName>TempBar.LibreHardwareMonitorLib.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\libs\HidSharp.dll">
+      <LogicalName>TempBar.HidSharp.dll</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Cleanup.cs" />
+    <Compile Include="DarkMenu.cs" />
+    <Compile Include="Geometry.cs" />
+    <Compile Include="IconFactory.cs" />
+    <Compile Include="Log.cs" />
+    <Compile Include="Native.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="SensorService.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Storage.cs" />
+    <Compile Include="TempBarContext.cs" />
+    <Compile Include="WidgetForm.cs" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

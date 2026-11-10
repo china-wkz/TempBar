@@ -1,0 +1,14 @@
+# build output
+dist/
+obj/
+bin/
+*.exe
+*.pdb
+*.sys
+
+# third-party binaries fetched by tools/fetch-libs.ps1
+libs/*.dll
+
+# local settings / logs
+data/
+*.log
