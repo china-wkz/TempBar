@@ -26,6 +26,34 @@ namespace TempBar
         public volatile bool GpuReady;
 
         private volatile bool _reinit;
+        private volatile bool _cpuEnabled = true;
+        private volatile bool _gpuEnabled = true;
+
+        /// <summary>When false the CPU is not sampled at all and the kernel driver is released.</summary>
+        public bool CpuEnabled
+        {
+            get { return _cpuEnabled; }
+            set
+            {
+                if (_cpuEnabled == value) return;
+                _cpuEnabled = value;
+                _lastCpuAttempt = DateTime.MinValue;
+                _wake.Set();
+            }
+        }
+
+        /// <summary>When false NVML is never touched, so the GPU driver library stays unloaded.</summary>
+        public bool GpuEnabled
+        {
+            get { return _gpuEnabled; }
+            set
+            {
+                if (_gpuEnabled == value) return;
+                _gpuEnabled = value;
+                _lastGpuAttempt = DateTime.MinValue;
+                _wake.Set();
+            }
+        }
 
         /// <summary>Ask the polling thread to drop every handle and rediscover the sensors.</summary>
         public void RequestReinit()
@@ -76,6 +104,21 @@ namespace TempBar
                     _lastGpuAttempt = DateTime.MinValue;
                 }
 
+                // A sensor the user turned off is not sampled: the CPU driver is unloaded and NVML
+                // is left alone entirely, so hiding GPU costs literally nothing.
+                if (!_cpuEnabled && _cpuSensor != null)
+                {
+                    CloseCpu();
+                    CpuTemp = -1;
+                    CpuReady = false;
+                }
+                if (!_gpuEnabled && _nvmlDevice != IntPtr.Zero)
+                {
+                    _nvmlDevice = IntPtr.Zero;
+                    GpuTemp = -1;
+                    GpuReady = false;
+                }
+
                 long started = Stopwatch.GetTimestamp();
                 try
                 {
@@ -119,6 +162,13 @@ namespace TempBar
 
         private void PollCpu()
         {
+            if (!_cpuEnabled)
+            {
+                CpuTemp = -1;
+                CpuReady = false;
+                return;
+            }
+
             if (_cpuSensor == null)
             {
                 // Without administrator rights the kernel driver cannot load, so LHM would only
@@ -230,6 +280,13 @@ namespace TempBar
         // ------------------------------------------------------------------ GPU
         private void PollGpu()
         {
+            if (!_gpuEnabled)
+            {
+                GpuTemp = -1;
+                GpuReady = false;
+                return;
+            }
+
             if (_nvmlDevice == IntPtr.Zero)
             {
                 if ((DateTime.UtcNow - _lastGpuAttempt).TotalSeconds < 15) { GpuTemp = -1; return; }

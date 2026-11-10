@@ -80,7 +80,8 @@ namespace TempBar
 
                 try
                 {
-                    using (var context = new TempBarContext())
+                    using (var context = new TempBarContext(
+                        HasFlag(args, "--cpu-only"), HasFlag(args, "--gpu-only")))
                     {
                         Application.Run(context);
                     }

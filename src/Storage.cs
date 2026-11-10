@@ -20,7 +20,8 @@ namespace TempBar
                 string[] candidates =
                 {
                     Path.Combine(Path.GetTempPath(), "TempBar"),
-                    Path.Combine(Path.GetTempPath(), "TempBar-" + System.Diagnostics.Process.GetCurrentProcess().Id)
+                    Path.Combine(Path.GetTempPath(), "TempBar-" + System.Diagnostics.Process.GetCurrentProcess().Id),
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data")
                 };
 
                 foreach (string candidate in candidates)

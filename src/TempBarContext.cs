@@ -35,7 +35,7 @@ namespace TempBar
         private bool _lastShowCpu, _lastShowGpu;
         private string _lastTrayText = string.Empty;
 
-        public TempBarContext()
+        public TempBarContext(bool cpuOnly, bool gpuOnly)
         {
             Log.Reset();
             _elevated = Native.IsElevated();
@@ -43,9 +43,13 @@ namespace TempBar
                       " | dir=" + Storage.Dir);
 
             _cfg = Settings.Load();
+            if (cpuOnly) _cfg.ShowGpu = false;
+            if (gpuOnly) _cfg.ShowCpu = false;
             _lightTheme = ResolveLightTheme();
 
             _sensors = new SensorService { IntervalMs = _cfg.IntervalMs };
+            _sensors.CpuEnabled = _cfg.ShowCpu;
+            _sensors.GpuEnabled = _cfg.ShowGpu;
             _sensors.Start();
 
             _widget = new WidgetForm { Locked = _cfg.Locked, RightGap = _cfg.RightGap };
@@ -122,13 +126,16 @@ namespace TempBar
             string cpuText = cpu > 0 ? cpu + "\u00B0C" : "--";
             string gpuText = gpu > 0 ? gpu + "\u00B0C" : "--";
 
-            string text;
-            if (IsElevated())
-                text = _sensors.CpuReady ? "CPU " + cpuText + "   GPU " + gpuText
-                                         : "CPU 驱动不可用   GPU " + gpuText;
-            else
-                text = "CPU " + cpuText + "(需管理员)   GPU " + gpuText;
+            var parts = new System.Collections.Generic.List<string>(2);
+            if (_cfg.ShowCpu)
+            {
+                if (!IsElevated()) parts.Add("CPU " + cpuText + "(需管理员)");
+                else if (_sensors.CpuReady) parts.Add("CPU " + cpuText);
+                else parts.Add("CPU 驱动不可用");
+            }
+            if (_cfg.ShowGpu) parts.Add("GPU " + gpuText);
 
+            string text = parts.Count == 0 ? "TempBar" : string.Join("   ", parts);
             if (text.Length > 63) text = text.Substring(0, 63);
             if (text != _lastTrayText)
             {
@@ -136,7 +143,7 @@ namespace TempBar
                 try { _tray.Text = text; } catch { }
             }
 
-            bool active = _sensors.CpuReady || _sensors.GpuReady;
+            bool active = (_cfg.ShowCpu && _sensors.CpuReady) || (_cfg.ShowGpu && _sensors.GpuReady);
             if (active != _iconActive)
             {
                 _iconActive = active;
@@ -318,6 +325,9 @@ namespace TempBar
                     Quit();
                     return;
             }
+
+            _sensors.CpuEnabled = _cfg.ShowCpu;
+            _sensors.GpuEnabled = _cfg.ShowGpu;
 
             _cfg.Save();
             _lastCpu = -2; // force a repaint on the next tick
